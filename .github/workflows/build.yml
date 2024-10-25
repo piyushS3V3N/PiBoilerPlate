@@ -33,7 +33,7 @@ jobs:
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             sudo apt-get install -y g++ make
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            brew install g++
+            brew install gcc
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             choco install mingw -y
           fi
