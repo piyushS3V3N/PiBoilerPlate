@@ -47,7 +47,7 @@ jobs:
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             # Create a Linux installer (e.g., .deb or .AppImage)
-            sudo apt-get install -y fpm
+            sudo apt-get install ruby-dev build-essential && sudo gem i fpm -f
             fpm -s dir -t deb ./build/my_executable /usr/local/bin/my_executable
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             # Create a macOS installer (e.g., .dmg)
