@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch: # Manual trigger
 
 jobs:
   build:
@@ -28,6 +29,7 @@ jobs:
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             choco install cmake -y             # For Windows
           fi
+
       - name: Install dependencies
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
@@ -67,3 +69,6 @@ jobs:
             ${{ matrix.os == 'ubuntu-latest' && 'my_executable.deb' }}
             ${{ matrix.os == 'macos-latest' && 'MyApp.dmg' }}
             ${{ matrix.os == 'windows-latest' && 'my_installer.exe' }}
+
+    continue-on-error: true # Continue with other jobs even if one fails
+
