@@ -21,10 +21,13 @@ jobs:
 
       - name: Setup CMake
         run: |
-          sudo apt-get install -y cmake g++ # For Ubuntu
-          brew install cmake                  # For macOS
-          choco install cmake -y             # For Windows
-
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get install -y cmake g++ # For Ubuntu
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            brew install cmake                  # For macOS
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            choco install cmake -y             # For Windows
+          fi
       - name: Install dependencies
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
