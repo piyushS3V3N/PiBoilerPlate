@@ -5,10 +5,8 @@
 #include <vector>
 #include "ConfigManager.h"
 
-PackageManager detectPackageManager() {
-    #ifdef _WIN32
-        return PackageManager::Chocolatey; // Windows
-    #elif defined(__APPLE__)
+PackageManager DependencyManager::detectPackageManager() {
+    #ifdef __APPLE__
         return PackageManager::Homebrew; // macOS
     #elif defined(__linux__)
         // Check for APT (Debian/Ubuntu)
@@ -27,12 +25,9 @@ PackageManager detectPackageManager() {
     return PackageManager::Unknown;
 }
 
-bool isDependencyAvailable(const std::string& dep, PackageManager pm) {
+bool DependencyManager::isDependencyAvailable(const std::string& dep, PackageManager pm) {
     std::string command;
     switch (pm) {
-        case PackageManager::Chocolatey:
-            command = "choco search " + dep + " --exact --limit-output";
-            break;
         case PackageManager::Homebrew:
             command = "brew search " + dep + " | grep -E '^\\s*" + dep + "$'";
             break;
@@ -52,12 +47,9 @@ bool isDependencyAvailable(const std::string& dep, PackageManager pm) {
     return (std::system(command.c_str()) == 0);
 }
 
-void installDependency(const std::string& dep, PackageManager pm) {
+void DependencyManager::installDependency(const std::string& dep, PackageManager pm) {
     std::string command;
     switch (pm) {
-        case PackageManager::Chocolatey:
-            command = "choco install " + dep + " -y";
-            break;
         case PackageManager::Homebrew:
             command = "brew install " + dep;
             break;
@@ -87,9 +79,9 @@ void installDependency(const std::string& dep, PackageManager pm) {
 
 void DependencyManager::addDependency(const std::string& library, const std::string& configPath) {
     PackageManager pm = detectPackageManager();
-    
+
     // Fetch available dependencies
-    auto availablePackages = getAvailableDependencies(library, pm);  // Ensure this matches the signature
+    auto availablePackages = getAvailableDependencies(library, pm);
 
     if (!isExactMatch(library, availablePackages)) {
         std::cerr << "Error: The dependency \"" << library << "\" is not available." << std::endl;
@@ -100,7 +92,6 @@ void DependencyManager::addDependency(const std::string& library, const std::str
                 std::cout << " - " << pkg << std::endl;
             }
         }
-
         return;
     }
 
@@ -116,15 +107,27 @@ void DependencyManager::addDependency(const std::string& library, const std::str
     std::cout << "Added dependency: " << library << " to " << configPath << std::endl;
 
     // Install the dependency
-    installDependency(library, pm);  // Ensure this matches the signature
+    installDependency(library, pm);
 }
 
-std::vector<std::string> getAvailableDependencies(const std::string& searchTerm, PackageManager pm) {
+void DependencyManager::checkAndInstallDependencies(const nlohmann::json& dependencies) {
+    PackageManager pm = detectPackageManager();
+    
+    for (const auto& item : dependencies.items()) {
+        const std::string& library = item.key();
+        
+        if (!isDependencyAvailable(library, pm)) {
+            std::cerr << "Dependency \"" << library << "\" is not installed. Installing..." << std::endl;
+            installDependency(library, pm);
+        } else {
+            std::cout << "Dependency \"" << library << "\" is already installed." << std::endl;
+        }
+    }
+}
+
+std::vector<std::string> DependencyManager::getAvailableDependencies(const std::string& searchTerm, PackageManager pm) {
     std::string command;
     switch (pm) {
-        case PackageManager::Chocolatey:
-            command = "choco search " + searchTerm;
-            break;
         case PackageManager::Homebrew:
             command = "brew search " + searchTerm;
             break;
@@ -160,5 +163,10 @@ std::vector<std::string> getAvailableDependencies(const std::string& searchTerm,
     }
     pclose(pipe);
     return packages;
+}
+
+// Define isExactMatch function if not already defined
+bool DependencyManager::isExactMatch(const std::string& library, const std::vector<std::string>& availablePackages) {
+    return std::find(availablePackages.begin(), availablePackages.end(), library) != availablePackages.end();
 }
 
