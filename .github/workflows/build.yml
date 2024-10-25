@@ -1,0 +1,66 @@
+name: Build and Package
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup CMake
+        run: |
+          sudo apt-get install -y cmake g++ # For Ubuntu
+          brew install cmake                  # For macOS
+          choco install cmake -y             # For Windows
+
+      - name: Install dependencies
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get install -y g++ make
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            brew install g++
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            choco install mingw -y
+          fi
+
+      - name: Configure CMake
+        run: cmake -S . -B build
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Create Installer
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            # Create a Linux installer (e.g., .deb or .AppImage)
+            sudo apt-get install -y fpm
+            fpm -s dir -t deb ./build/my_executable /usr/local/bin/my_executable
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            # Create a macOS installer (e.g., .dmg)
+            hdiutil create -volname MyApp -srcfolder ./build -ov -format UDZO MyApp.dmg
+          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            # Create a Windows installer (e.g., .exe using NSIS)
+            choco install nsis -y
+            makensis myinstaller.nsi
+          fi
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: installer-${{ matrix.os }}
+          path: |
+            ${{ matrix.os == 'ubuntu-latest' && 'my_executable.deb' }}
+            ${{ matrix.os == 'macos-latest' && 'MyApp.dmg' }}
+            ${{ matrix.os == 'windows-latest' && 'my_installer.exe' }}

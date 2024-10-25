@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "fmt": "latest",
+    "spdlog": "latest"
+  }
+}
