@@ -33,11 +33,12 @@ jobs:
       - name: Install dependencies
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            sudo apt-get install -y g++ make
+            sudo apt-get install -y g++ make nlohmann-json-dev
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            brew install gcc
+            brew install gcc nlohmann-json
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             choco install mingw -y
+            # You might need to manually download and install nlohmann_json for Windows
           fi
 
       - name: Configure CMake
