@@ -1,6 +1,7 @@
 # PiBoilerplate
 
 PiBoilerplate is a cross-platform C++ project generator designed to simplify the setup of CMake projects. It manages dependencies using popular package managers across different operating systems, including macOS, and Linux.
+
 [![Build and Package](https://github.com/piyushS3V3N/PiBoilerPlate/actions/workflows/build.yml/badge.svg)](https://github.com/piyushS3V3N/PiBoilerPlate/actions/workflows/build.yml)
 
 ## Features
