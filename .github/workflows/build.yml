@@ -56,7 +56,7 @@ jobs:
             fpm -s zip -t deb --prefix /usr/bin -n CMakeBoilerplateGenerator -v 1.0.0 ./CMakeBoilerplateGenerator.zip
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             # Create a macOS installer (e.g., .dmg)
-            hdiutil create -volname MyApp -srcfolder ./build -ov -format UDZO MyApp.dmg
+            hdiutil create -volname MyApp -srcfolder ./build -ov -format UDZO CMakeBoilerplateGenerator.dmg
           fi
 
       - name: Upload Artifacts
@@ -64,8 +64,8 @@ jobs:
         with:
           name: installer-${{ matrix.os }}
           path: |
-            ${{ matrix.os == 'ubuntu-latest' && 'my_executable.deb' }}
-            ${{ matrix.os == 'macos-latest' && 'MyApp.dmg' }}
+            ${{ matrix.os == 'ubuntu-latest' && 'CMakeBoilerplateGenerator.deb' }}
+            ${{ matrix.os == 'macos-latest' && 'CMakeBoilerplateGenerator.dmg' }}
 
     continue-on-error: true # Continue with other jobs even if one fails
 
