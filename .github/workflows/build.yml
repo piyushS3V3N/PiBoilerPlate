@@ -23,7 +23,7 @@ jobs:
       - name: Setup CMake
         uses: jwlawson/actions-setup-cmake@v1
         with:
-          cmake-version: '3.20'  # Specify your CMake version
+          cmake-version: "3.20" # Specify your CMake version
 
       - name: Install dependencies
         run: |
@@ -51,9 +51,6 @@ jobs:
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             hdiutil create -volname CMakeBoilerplateGenerator -srcfolder ./build -ov -format UDZO CMakeBoilerplateGenerator.dmg
           fi
-
-      - name: Release Tag Updater
-        uses: sersoft-gmbh/running-release-tags-action@v3.0
 
       - name: Upload Artifacts
         if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Conditional check
