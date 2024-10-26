@@ -51,7 +51,7 @@ jobs:
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             # Create a Linux installer (e.g., .deb or .AppImage)
             sudo apt-get install ruby-dev build-essential && sudo gem i fpm -f
-            fpm -s dir -t deb ./build/CMakeBoilerplateGenerator /usr/local/bin/CMakeBoilerplateGenerator
+            fpm -s dir -t deb ./build/CMakeBoilerplateGenerator --prefix=/usr/local/bin
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             # Create a macOS installer (e.g., .dmg)
             hdiutil create -volname MyApp -srcfolder ./build -ov -format UDZO MyApp.dmg
