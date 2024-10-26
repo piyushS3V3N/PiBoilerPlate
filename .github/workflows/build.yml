@@ -50,7 +50,7 @@ jobs:
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
             # Create a Linux installer (e.g., .deb or .AppImage)
-            sudo apt-get install ruby-dev build-essential && sudo gem i fpm -f
+            sudo apt-get install ruby-dev build-essential && sudo gem install fpm -f
             zip ./CMakeBoilerplateGenerator.zip ./build/CMakeBoilerplateGenerator
             # Create the Debian package from the zip file
             fpm -s zip -t deb --prefix /usr/bin -n CMakeBoilerplateGenerator -v 1.0.0 ./CMakeBoilerplateGenerator.zip
@@ -60,9 +60,10 @@ jobs:
           fi
 
       - name: Upload Artifacts
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' # Conditional check
         uses: actions/upload-artifact@v4
         with:
           name: installer-${{ matrix.os }}
           path: |
-            ${{ matrix.os == 'ubuntu-latest' && 'cmakeboilerplategenerator_1.0.0_amd64.deb' }}
+            ${{ matrix.os == 'ubuntu-latest' && 'CMakeBoilerplateGenerator_1.0.0_amd64.deb' }}
             ${{ matrix.os == 'macos-latest' && 'CMakeBoilerplateGenerator.dmg' }}
