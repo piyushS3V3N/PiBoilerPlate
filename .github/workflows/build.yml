@@ -21,20 +21,16 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup CMake
-        run: |
-          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            sudo apt-get install -y cmake g++ # For Ubuntu
-          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            brew install cmake                  # For macOS
-          fi
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: "3.20" # Specify your CMake version
 
       - name: Install dependencies
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            sudo apt-get install -y g++ make nlohmann-json3-dev
+            sudo apt-get update && sudo apt-get install -y g++ make nlohmann-json3-dev
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install gcc nlohmann-json
-            # You might need to manually download and install nlohmann_json for Windows
           fi
 
       - name: Configure CMake
@@ -49,14 +45,11 @@ jobs:
       - name: Create Installer
         run: |
           if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            # Create a Linux installer (e.g., .deb or .AppImage)
-            sudo apt-get install ruby-dev build-essential && sudo gem install fpm -f
+            sudo apt-get install -y ruby-dev build-essential && sudo gem install fpm -f
             zip ./CMakeBoilerplateGenerator.zip ./build/CMakeBoilerplateGenerator
-            # Create the Debian package from the zip file
             fpm -s zip -t deb --prefix /usr/bin -n CMakeBoilerplateGenerator -v 1.0.0 ./CMakeBoilerplateGenerator.zip
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
-            # Create a macOS installer (e.g., .dmg)
-            hdiutil create -volname MyApp -srcfolder ./build -ov -format UDZO CMakeBoilerplateGenerator.dmg
+            hdiutil create -volname CMakeBoilerplateGenerator -srcfolder ./build -ov -format UDZO CMakeBoilerplateGenerator.dmg
           fi
 
       - name: Upload Artifacts
@@ -67,3 +60,12 @@ jobs:
           path: |
             ${{ matrix.os == 'ubuntu-latest' && 'cmakeboilerplategenerator_1.0.0_amd64.deb' }}
             ${{ matrix.os == 'macos-latest' && 'CMakeBoilerplateGenerator.dmg' }}
+
+      - name: Cleanup
+        run: |
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            sudo apt-get clean
+          elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            # Clean up any temporary files if needed
+            rm -rf ./build
+          fi
