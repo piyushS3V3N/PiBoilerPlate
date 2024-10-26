@@ -66,6 +66,3 @@ jobs:
           path: |
             ${{ matrix.os == 'ubuntu-latest' && 'cmakeboilerplategenerator_1.0.0_amd64.deb' }}
             ${{ matrix.os == 'macos-latest' && 'CMakeBoilerplateGenerator.dmg' }}
-
-    continue-on-error: true # Continue with other jobs even if one fails
-
