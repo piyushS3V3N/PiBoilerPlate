@@ -65,5 +65,5 @@ jobs:
         with:
           name: installer-${{ matrix.os }}
           path: |
-            ${{ matrix.os == 'ubuntu-latest' && 'CMakeBoilerplateGenerator_1.0.0_amd64.deb' }}
+            ${{ matrix.os == 'ubuntu-latest' && 'cmakeboilerplategenerator_1.0.0_amd64.deb' }}
             ${{ matrix.os == 'macos-latest' && 'CMakeBoilerplateGenerator.dmg' }}
